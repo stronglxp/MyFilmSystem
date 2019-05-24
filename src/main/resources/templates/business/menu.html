@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<div class="col-md-2" th:fragment="menu">
+    <ul class="nav nav-pills nav-stacked" id="nav">
+        <li>
+            <a th:href="@{/business/film/list}">电影列表
+                <span class="glyphicon glyphicon-film pull-right"></span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/business/order/list}">订单列表
+                <span class="glyphicon glyphicon-heart pull-right"></span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/business/canema/info}">影院信息
+                <span class="glyphicon glyphicon-home pull-right" />
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/business/passwordReset}">修改密码
+                <sapn class="glyphicon glyphicon-pencil pull-right" />
+            </a>
+        </li>
+    </ul>
+</div>

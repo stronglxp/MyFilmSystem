@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zmq.filmsystem.dao.CanemaMapper" >
+
+    <!--增加一个影院，并返回生成的主键-->
+    <insert id="addCanema" parameterType="canema" useGeneratedKeys="true" keyProperty="canemaId">
+        insert into canema(canema_name, canema_address, canema_line, canema_img_url)
+        value (#{canemaName}, #{canemaAddress}, #{canemaLine}, #{canemaImgUrl})
+    </insert>
+
+    <!--获取影院信息-->
+    <select id="getCanemaInfo" resultType="canema">
+        select canema_id, canema_name, canema_address, canema_line, canema_img_url
+        from canema
+        <where>
+            canema_id = #{canemaId}
+        </where>
+    </select>
+
+    <!--更新影院信息-->
+    <update id="updateCanema" parameterType="canema">
+        update canema set canema_name = #{canemaName}, canema_address = #{canemaAddress},
+                          canema_line = #{canemaLine}
+        <where>
+            canema_id = #{canemaId}
+        </where>
+    </update>
+
+    <!--获取所有的影院-->
+    <select id="getCanemaList" resultType="map">
+        select canema_id, canema_name, canema_address, canema_line, canema_img_url
+        from canema
+    </select>
+
+    <!--搜索影院-->
+    <select id="searchCanema" resultType="map">
+        select canema_id, canema_name, canema_address, canema_line, canema_img_url
+        from canema
+        <where>
+            canema_name like '%' #{canemaName} '%'
+        </where>
+    </select>
+
+</mapper>

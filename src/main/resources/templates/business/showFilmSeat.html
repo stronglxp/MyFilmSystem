@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>选座购票</title>
+    <!-- Bootstrap -->
+    <link th:href="@{../../static/css/bootstrap.css}" rel="stylesheet">
+    <link th:href="@{../../static/css/bootstrap-theme.css}" rel="stylesheet">
+    <link th:href="@{../../static/css/jq22.css}" rel="stylesheet">
+    <style type="text/css">
+
+        .front {
+            width: 280px;
+            margin: 5px 32px 45px 32px;
+            background-color: #f0f0f0;
+            color: #666;
+            text-align: center;
+            padding: 3px;
+            border-radius: 5px;
+        }
+
+        .booking_area {
+            float: right;
+            position: relative;
+            width: 200px;
+            height: 450px;
+        }
+
+        .booking_area h3 {
+            margin: 5px 5px 0 0;
+            font-size: 16px;
+        }
+
+        .booking_area p {
+            line-height: 26px;
+            font-size: 16px;
+            color: #999
+        }
+
+        .booking_area p span {
+            color: #666
+        }
+
+        div.seatCharts-cell {
+            color: #182C4E;
+            height: 25px;
+            width: 25px;
+            line-height: 25px;
+            margin: 3px;
+            float: left;
+            text-align: center;
+            outline: none;
+            font-size: 13px;
+        }
+
+        div.seatCharts-seat {
+            color: #fff;
+            cursor: pointer;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+        }
+
+        div.seatCharts-row {
+            height: 35px;
+        }
+
+        div.seatCharts-seat.available {
+            background-color: #B9DEA0;
+        }
+
+        div.seatCharts-seat.focused {
+            background-color: #76B474;
+            border: none;
+        }
+
+        div.seatCharts-seat.selected {
+            background-color: #E6CAC4;
+        }
+
+        div.seatCharts-seat.unavailable {
+            background-color: #472B34;
+            cursor: not-allowed;
+        }
+
+        div.seatCharts-container {
+            border-right: 1px dotted #adadad;
+            width: 400px;
+            padding: 20px;
+            float: left;
+        }
+
+        div.seatCharts-legend {
+            padding-left: 0px;
+            position: absolute;
+            bottom: 16px;
+        }
+
+        ul.seatCharts-legendList {
+            padding-left: 0px;
+        }
+
+        .seatCharts-legendItem {
+            float: left;
+            width: 90px;
+            margin-top: 10px;
+            line-height: 2;
+        }
+
+        span.seatCharts-legendDescription {
+            margin-left: 5px;
+            line-height: 30px;
+        }
+
+        .checkout-button {
+            display: block;
+            width: 80px;
+            height: 24px;
+            line-height: 20px;
+            margin: 10px auto;
+            border: 1px solid #999;
+            font-size: 14px;
+            cursor: pointer
+        }
+
+        #seats_chose {
+            max-height: 150px;
+            overflow-y: auto;
+            overflow-x: none;
+            width: 200px;
+        }
+
+        #seats_chose li {
+            float: left;
+            width: 72px;
+            height: 26px;
+            line-height: 26px;
+            border: 1px solid #d3d3d3;
+            background: #f7f7f7;
+            margin: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center
+        }
+
+        .filmList {
+            height: 50px;
+            border-left: 6px solid black;
+            margin: 20px 0;
+        }
+
+        .filmList p {
+            font-size: 20px;
+            line-height: 50px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand">电影票务系统</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbar-body">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <span class="glyphicon glyphicon-user"><shiro:principal /></span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a th:href="@{/business/film/list}">回到后台</a></li>
+                            <li><a th:href="@{/logout}">退出系统</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="filmList">
+                    <p>选座购票</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo clearfix">
+            <!---左边座位列表----->
+            <div id="seat_area">
+                <div class="front">屏幕</div>
+            </div>
+
+            <!---右边选座信息----->
+            <div class="booking_area">
+                <p>电影：<span th:text="${film.filmName}"></span></p>
+                <p>时间：<span th:text="${#dates.format(film.filmTime, 'yyyy-MM-dd')}"></span></p>
+                <p>座位：</p>
+                <ul id="seats_chose"></ul>
+                <p>票数：<span id="tickects_num">0</span></p>
+                <p>总价：<b>￥<span id="total_price">0</span></b></p>
+                <button type="button" class="btn btn-success" th:onclick="pickTicket()">确定购买</button>
+                <div id="legend"></div>
+            </div>
+        </div>
+    </div>
+
+    <!--消息模态框-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="errMsg">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p th:text="${msg}" id="msg"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="javascript:go();">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{../../static/js/jquery-3.0.0.min.js}" type="text/javascript"></script>
+    <script th:src="@{../../static/js/bootstrap.js}" type="text/javascript"></script>
+    <script th:src="@{../../static/js/jquery.seat-charts.min.js}" type="text/javascript"></script>
+    <script th:inline="javascript">
+
+        /*<![CDATA[*/
+
+        var msg = /*[[${msg}]]*/ null;
+        if(msg != null) {
+            // 显示错误信息
+            $('#errMsg').modal('show');
+        }
+
+        // 电影票价
+        var price = /*[[${film.filmPrice}]]*/ null;
+        // 已被选的数组
+        var seatArr = /*[[${seatArr}]]*/ null;
+        // 电影id
+        var filmId = /*[[${filmId}]]*/ null;
+        // 已定座位
+        var checkSeat = {};
+        var num = 0;
+
+        $(document).ready(function () {
+            var $cart = $('#seats_chose'), //座位区
+                $tickects_num = $('#tickects_num'), //票数
+                $total_price = $('#total_price'); //票价总额
+
+            var sc = $('#seat_area').seatCharts({
+                map: [//座位结构图 a 代表座位; 下划线 "_" 代表过道
+                    'ccccccccc',
+                    'ccccccccc',
+                    '_________',
+                    'ccccccccc',
+                    'ccccccccc',
+                    'ccccccccc',
+                    'ccccccccc',
+                    'ccccccccc',
+                    'ccccccccc',
+                    'ccccccccc'
+                ],
+
+                naming: {//设置行列等信息
+                    top: false, //不显示顶部横坐标（行）
+                    getLabel: function (character, row, column) { //返回座位信息
+                        return column;
+                    }
+                },
+
+                legend: {//定义图例
+                    node: $('#legend'),
+                    items: [
+                        ['c', 'available', '可选座'],
+                        ['c', 'unavailable', '已售出']
+                    ]
+                },
+
+                click: function () {
+                    if (this.status() == 'available') { //若为可选座状态，添加座位
+                        $('<li>' + (this.settings.row + 1) + '排' + this.settings.label + '座</li>')
+                            .attr('id', 'cart-item-' + this.settings.id)
+                            .data('seatId', this.settings.id)
+                            .appendTo($cart);
+                        $tickects_num.text(sc.find('selected').length + 1); //统计选票数量
+                        $total_price.text(getTotalPrice(sc) + price);//计算票价总金额
+
+                        checkSeat[this.settings.id] = [(this.settings.row + 1) + ',' + this.settings.label];
+                        num++;
+                        return 'selected';
+                    } else if (this.status() == 'selected') { //若为选中状态
+                        $tickects_num.text(sc.find('selected').length - 1);//更新票数量
+                        $total_price.text(getTotalPrice(sc) - price);//更新票价总金额
+                        $('#cart-item-' + this.settings.id).remove();//删除已预订座位
+
+                        checkSeat[this.settings.id] = null;
+                        num--;
+                        return 'available';
+                    } else if (this.status() == 'unavailable') { //若为已售出状态
+                        return 'unavailable';
+                    } else {
+                        return this.style();
+                    }
+                }
+            });
+
+            //设置已售出的座位
+            for(var i = 0; i < seatArr.length; i++) {
+                var arr = seatArr[i];
+                var a = arr[0] + '_' + arr[1];
+                console.log("a = " + a);
+                sc.get(a).status('unavailable');
+            }
+
+        });
+
+
+        function getTotalPrice(sc) { //计算票价总额
+            var total = 0;
+            sc.find('selected').each(function () {
+                total += price;
+            });
+            return total;
+        }
+
+        // 购票
+        function pickTicket() {
+            console.log(checkSeat);
+            console.log(num);
+
+            if(num == 0) {
+                $('#msg').text('请选择座位!');
+                $('#errMsg').modal('show');
+            } else {
+
+                var arr = [];
+
+                for(var i in checkSeat) {
+                    arr.push(checkSeat[i]);
+                }
+
+                console.log(arr)
+
+                $.ajax({
+                    url:"/pick/ticket?filmId=" + filmId,
+                    type:"post",
+                    contentType:"application/json",
+                    data:JSON.stringify(arr),
+                    success:function (data) {
+                        console.log(data)
+                        if(data == 0) {
+                            // 给模态框赋值
+                            $('#msg').text('订票成功!');
+                        } else {
+                            // 给模态框赋值
+                            $('#msg').text('订票失败!');
+                        }
+                        $('#errMsg').modal('show');
+
+                    },
+                    error:function () {
+                        // 给模态框赋值
+                        $('#msg').text('订票失败!');
+                        $('#errMsg').modal('show');
+                    }
+                });
+            }
+
+        }
+
+        // 跳转到接口
+        function go() {
+            window.location.href = "/film/seat/list?type=business&filmId=" + filmId;
+        }
+
+        /*]]>*/
+
+    </script>
+</body>
+</html>

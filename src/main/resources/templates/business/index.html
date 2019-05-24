@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>首页</title>
+    <!-- Bootstrap -->
+    <link th:href="@{../../static/css/bootstrap.css}" rel="stylesheet">
+    <link th:href="@{../../static/css/bootstrap-theme.css}" rel="stylesheet">
+    <style type="text/css">
+
+        .canemaList {
+            height: 50px;
+            border-left: 6px solid black;
+            margin: 20px 0;
+        }
+
+        .canemaList p {
+            font-size: 20px;
+            line-height: 50px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .join {
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand">电影票务系统</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbar-body">
+                <form class="navbar-form navbar-left" th:action="@{'/search/canema?type=business'}" method="post">
+                    <div class="form-group">
+                        <input type="text" name="canemaName" class="form-control" placeholder="输入影院名称进行搜索" required>
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <span class="glyphicon glyphicon-user"><shiro:principal /></span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a th:href="@{/business/film/list}">回到后台</a></li>
+                            <li><a th:href="@{/logout}">退出系统</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!--轮播图-->
+        <div th:replace="carousel :: html"></div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="canemaList">
+                    <p>影院列表</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" th:if="${#lists.isEmpty(canemaList)}">
+            <h1>没有任何影院!</h1>
+        </div>
+
+        <div class="row" th:if="${not #lists.isEmpty(canemaList)}">
+            <div class="col-md-3" th:each="canema:${canemaList}">
+                <div class="thumbnail">
+                    <img th:src="${canema['canema_img_url']}" th:alt="${canema['canema_name']}" />
+                    <div class="caption">
+                        <h3 th:text="${canema['canema_name']}">牛逼电影院</h3>
+                        <p th:text="${'地址:' + canema['canema_address']}">地址：江苏省南京市江宁区万达广场</p>
+                        <p th:text="${'联系方式:' + canema['canema_line']}">联系电话：025-51899999</p>
+                        <p class="join"><a th:href="@{'/film/list?canemaId=' + ${canema['canema_id']} + '&type=business'}" class="btn btn-success" role="button">进入影院</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--消息模态框-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="errMsg">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p th:text="${msg}"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{../../static/js/jquery-3.0.0.min.js}" type="text/javascript"></script>
+    <script th:src="@{../../static/js/bootstrap.js}" type="text/javascript"></script>
+    <script th:inline="javascript">
+
+        /*<![CDATA[*/
+
+        var msg = /*[[${msg}]]*/ null;
+        if(msg != null) {
+            // 显示错误信息
+            $('#errMsg').modal('show');
+        }
+
+        /*]]>*/
+
+    </script>
+</body>
+</html>

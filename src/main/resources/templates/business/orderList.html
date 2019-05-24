@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>订单列表</title>
+    <!-- Bootstrap -->
+    <link th:href="@{../../static/css/bootstrap.css}" rel="stylesheet">
+    <link th:href="@{../../static/css/bootstrap-theme.css}" rel="stylesheet">
+    <style type="text/css">
+        thead th {
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!--顶部栏-->
+    <div th:replace="business/top :: html"></div>
+
+    <!-- 中间主体 -->
+    <div class="container" id="content">
+        <div class="row">
+            <div th:replace="business/menu :: html"></div>
+            <div class="col-md-10">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <h1 class="col-md-4">订单信息</h1>
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>顾客名称</th>
+                                <th>电影名称</th>
+                                <th>座位号</th>
+                                <th>预定时间</th>
+                            </tr>
+                        </thead>
+                        <tbody th:if="${#lists.isEmpty(orderList)}">
+                            <tr style="text-align: center; color: red;">
+                                <td colspan="5">没有订单信息</td>
+                            </tr>
+                        </tbody>
+                        <tbody th:if="${not #lists.isEmpty(orderList)}">
+                            <th:block th:each="order, iterStat:${orderList}">
+                                <tr>
+                                    <!--遍历map-->
+                                    <td th:text="${(pageVo.currentPageNo - 1) * 5 + iterStat.count}" th:if="${pageVo}">0</td>
+                                    <td th:text="${iterStat.count}" th:if="${pageVo == null}">0</td>
+                                    <td th:text="${order['user_name']}">0</td>
+                                    <td th:text="${order['film_name']}">0</td>
+                                    <td th:text="${order['film_seat_row'] + '排' + order['film_seat_col'] + '座'}">0</td>
+                                    <td th:text="${#dates.format(order['order_time'], 'yyyy-MM-dd HH:mm:ss')}">0</td>
+                                </tr>
+                            </th:block>
+                        </tbody>
+                    </table>
+                    <div class="panel-footer" th:if="${pageVo}">
+                        <nav style="text-align: center">
+                            <ul class="pagination">
+                                <li>
+                                    <a th:href="@{'/business/order/list?page=' + ${pageVo.prePageNo}}">&laquo;
+                                        上一页</a>
+                                </li>
+                                <li class="active">
+                                    <a href="" th:value="${pageVo.currentPageNo}" th:text="${pageVo.currentPageNo}">1</a>
+                                </li>
+
+                                <li th:if="${pageVo.currentPageNo + 1 <= pageVo.totalCount}">
+                                    <a th:href="@{'/business/order/list?page=' + ${pageVo.currentPageNo + 1}}"
+                                       th:text="${pageVo.currentPageNo+1}">2</a>
+                                </li>
+                                <li th:if="${pageVo.currentPageNo + 2 <= pageVo.totalCount}">
+                                    <a th:href="@{'/business/order/list?page=' + ${pageVo.currentPageNo + 2}}"
+                                       th:text="${pageVo.currentPageNo + 2}">3</a>
+                                </li>
+                                <li th:if="${pageVo.currentPageNo + 3 <= pageVo.totalCount}">
+                                    <a th:href="@{'/business/order/list?page=' + ${pageVo.currentPageNo + 3}}"
+                                       th:text="${pageVo.currentPageNo + 3}">4</a>
+                                </li>
+                                <li th:if="${pageVo.currentPageNo + 4 <= pageVo.totalCount}">
+                                    <a th:href="@{'/business/order/list?page=' + ${pageVo.currentPageNo + 4}}"
+                                       th:text="${pageVo.currentPageNo + 4}">5</a>
+                                </li>
+                                <li>
+                                    <a th:href="@{'/business/order/list?page=' + ${pageVo.totalCount}}">最后一页&raquo;</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="footer">
+        <div class="row">
+            <div class="col-md-12"></div>
+        </div>
+    </div>
+
+    <!--消息模态框-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="alertMsg">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p th:text="${msg}" id="msgP"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="javascript:go();">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{../../static/js/jquery-3.0.0.min.js}" type="text/javascript"></script>
+    <script th:src="@{../../static/js/bootstrap.js}" type="text/javascript"></script>
+    <script th:inline="javascript">
+
+        $("#nav li:nth-child(2)").addClass("active");
+
+        var msg = /*[[${msg}]]*/ null;
+
+        if(msg != null) {
+            // 显示信息
+            $('#alertMsg').modal('show');
+        }
+
+        // 跳转到接口
+        function go() {
+            window.location.href = "/business/order/list";
+        }
+
+    </script>
+</body>
+</html>

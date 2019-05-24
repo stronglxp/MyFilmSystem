@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zmq.filmsystem.dao.FilmSeatMapper" >
+
+    <!--删除某部电影的所有座位-->
+    <delete id="deleteSeat">
+        delete from film_seat
+        <where>
+            film_id = #{filmId}
+        </where>
+    </delete>
+
+    <!--为某部电影增加座位-->
+    <insert id="insertSeat" parameterType="map">
+        insert into film_seat(film_id, film_seat_row, film_seat_col) values
+        <foreach collection="seatList" item="seat" separator=",">
+            <foreach collection="seat" item="col" index="row" separator=",">
+                (#{filmId}, #{row}, #{col})
+            </foreach>
+        </foreach>
+    </insert>
+
+    <!--获取某个电影已被预订的座位-->
+    <select id="getUnAcSeat" resultType="map">
+        select film_seat_row, film_seat_col from film_seat
+        <where>
+            film_id = #{filmId} and film_seat_is_active = 0
+        </where>
+    </select>
+
+    <!--更新座位状态-->
+    <update id="updateSeat" parameterType="filmSeat">
+        update film_seat set film_seat_is_active = #{filmSeatIsActive}
+        <where>
+            film_id = #{filmId} and film_seat_row = #{filmSeatRow}
+            and film_seat_col = #{filmSeatCol}
+        </where>
+    </update>
+
+</mapper>

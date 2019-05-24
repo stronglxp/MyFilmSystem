@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>电影列表</title>
+    <!-- Bootstrap -->
+    <link th:href="@{../../static/css/bootstrap.css}" rel="stylesheet">
+    <link th:href="@{../../static/css/bootstrap-theme.css}" rel="stylesheet">
+    <style type="text/css">
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        thead th {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        tbody td {
+
+            text-align: center;
+            line-height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!--顶部栏-->
+    <div th:replace="business/top :: html"></div>
+
+    <!-- 中间主体 -->
+    <div class="container" id="content">
+        <div class="row">
+            <div th:replace="business/menu :: html"></div>
+            <div class="col-md-10">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <form class="bs-example bs-example-form col-md-4" role="form" style="margin: 20px 0 10px
+                                     0;" th:action="@{/business/selectFilm}" id="form1" method="post">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="请输入电影名称" name="filmName" required>
+                                    <span class="input-group-btn">
+                                            <input type="submit" class="btn btn-default" value="搜索"/>
+                                        </span>
+                                </div>
+                            </form>
+                            <button class="btn btn-default col-md-2" style="margin-top: 20px">
+                                <a data-toggle="modal" href="#addFilm" role="button"
+                                   style="color: black; text-decoration: none">
+                                    添加电影
+                                    <sapn class="glyphicon glyphicon-plus"/>
+                                </a>
+                            </button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>名称</th>
+                                <th>简介</th>
+                                <th>海报</th>
+                                <th>价格</th>
+                                <th>时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody th:if="${#lists.isEmpty(filmList)}">
+                            <tr style="text-align: center; color: red;">
+                                <td colspan="7">没有电影信息</td>
+                            </tr>
+                        </tbody>
+                        <tbody th:if="${not #lists.isEmpty(filmList)}">
+                            <th:block th:each="film, iterStat:${filmList}">
+                                <tr>
+                                    <!--遍历map-->
+                                    <td th:text="${(pageVo.currentPageNo - 1) * 5 + iterStat.count}" th:if="${pageVo}">0</td>
+                                    <td th:text="${iterStat.count}" th:if="${pageVo == null}">0</td>
+                                    <td th:text="${film['film_name']}" style="font-weight:bold;">0</td>
+                                    <td>
+                                        <textarea th:text="${film['film_info']}" cols="50" rows="5"></textarea>
+                                    </td>
+                                    <td>
+                                        <img th:src="${film['img_url']}" alt="电影海报" disabled style="width: 100px; height: 100px;">
+                                    </td>
+                                    <td th:text="${film['film_price']}">0</td>
+                                    <td th:text="${film['film_time']}">0</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-default btn-info">
+                                            <a data-toggle="modal" href="#updateFilm" role="button"
+                                               th:onclick="passUpdateId([[${film['film_id']}]], [[${film['film_name']}]],
+                                                [[${film['film_info']}]], [[${film['img_url']}]], [[${film['film_price']}]],
+                                                [[${film['film_time']}]]);"
+                                               style="text-decoration: none; color: white; font-weight: lighter">
+                                                修改
+                                            </a>
+                                        </button>
+                                        <button class="btn btn-xs btn-default btn-danger btn-primary">
+                                            <a th:onclick="passId([[${film['film_id']}]]);"
+                                               data-toggle="modal" href="#sureDel" role="button"
+                                               style="text-decoration: none; color: white; font-weight: lighter">
+                                                删除
+                                            </a>
+                                        </button>
+                                        <!--弹出框-->
+                                    </td>
+                                </tr>
+                            </th:block>
+                        </tbody>
+                    </table>
+                    <div class="panel-footer" th:if="${pageVo}">
+                        <nav style="text-align: center">
+                            <ul class="pagination">
+                                <li>
+                                    <a th:href="@{'/business/film/list?page=' + ${pageVo.prePageNo}}">&laquo;
+                                        上一页</a>
+                                </li>
+                                <li class="active">
+                                    <a href="" th:value="${pageVo.currentPageNo}" th:text="${pageVo.currentPageNo}">1</a>
+                                </li>
+
+                                <li th:if="${pageVo.currentPageNo + 1 <= pageVo.totalCount}">
+                                    <a th:href="@{'/business/film/list?page=' + ${pageVo.currentPageNo + 1}}"
+                                       th:text="${pageVo.currentPageNo+1}">2</a>
+                                </li>
+                                <li th:if="${pageVo.currentPageNo + 2 <= pageVo.totalCount}">
+                                    <a th:href="@{'/business/film/list?page=' + ${pageVo.currentPageNo + 2}}"
+                                       th:text="${pageVo.currentPageNo + 2}">3</a>
+                                </li>
+                                <li th:if="${pageVo.currentPageNo + 3 <= pageVo.totalCount}">
+                                    <a th:href="@{'/business/film/list?page=' + ${pageVo.currentPageNo + 3}}"
+                                       th:text="${pageVo.currentPageNo + 3}">4</a>
+                                </li>
+                                <li th:if="${pageVo.currentPageNo + 4 <= pageVo.totalCount}">
+                                    <a th:href="@{'/business/film/list?page=' + ${pageVo.currentPageNo + 4}}"
+                                       th:text="${pageVo.currentPageNo + 4}">5</a>
+                                </li>
+                                <li>
+                                    <a th:href="@{'/business/film/list?page=' + ${pageVo.totalCount}}">最后一页&raquo;</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="footer">
+        <div class="row">
+            <div class="col-md-12"></div>
+        </div>
+    </div>
+
+    <!--添加电影模态框-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="addFilm">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="form-horizontal" role="form" enctype="multipart/form-data" th:action="@{/business/addFilm}" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">添加电影</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" th:value="${canemaId}" name="canemaId">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1">电影名称</span>
+                            <input type="text" class="form-control" name="filmName" id="addFilmName"
+                                   placeholder="请输入电影名称" required="required" aria-describedby="basic-addon1">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon2">电影简介</span>
+                            <textarea class="form-control" name="filmInfo" id="addFilmInfo"
+                                   placeholder="请输入电影简介" required="required" aria-describedby="basic-addon2"
+                                      rows="10" cols="30" maxlength="500"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon3">电影价格</span>
+                            <input type="text" class="form-control" name="filmPrice" id="addFilmPrice"
+                                   placeholder="请输入电影价格" required="required" aria-describedby="basic-addon3">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon4">电影放映时间</span>
+                            <input type="date" class="form-control" name="filmTime" id="addFilmTime"
+                                   placeholder="请输入电影放映时间"  value="2019-05-20" required="required" aria-describedby="basic-addon4">
+                        </div>
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <span>选择照片</span>
+                                <input type="file" name="file" required></input>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger"data-dismiss="modal">关闭</button>
+                        <button type="submit" class="btn btn-success">确定</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--更新电影模态框-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="updateFilm">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="form-horizontal" role="form" th:action="@{/business/updateFilm}" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">更新电影信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="filmId" id="updateId" value="">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon5">电影名称</span>
+                            <input type="text" class="form-control" name="filmName" id="updateFilmName"
+                                   placeholder="请输入电影名称" required="required" aria-describedby="basic-addon5">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon6">电影简介</span>
+                            <textarea class="form-control" name="filmInfo" id="updateFilmInfo"
+                                      placeholder="请输入电影简介" required="required" aria-describedby="basic-addon6"
+                                      rows="10" cols="30" maxlength="500"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon7">电影价格</span>
+                            <input type="text" class="form-control" name="filmPrice" id="updateFilmPrice"
+                                   placeholder="请输入电影价格" required="required" aria-describedby="basic-addon7">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon8">电影放映时间</span>
+                            <input type="date" class="form-control" name="filmTime" id="updateFilmTime"
+                                   placeholder="请输入电影放映时间"  value="2019-05-20" required="required" aria-describedby="basic-addon8">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">海报</span>
+                            <img alt="电影海报" disabled style="width: 200px; height: 200px;" id="imgSrc">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger"data-dismiss="modal">关闭</button>
+                        <button type="submit" class="btn btn-success">确定</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--是否删除模态框-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="sureDel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="form-horizontal" role="form" th:action="@{/business/removeFilm}" method="post">
+                    <input type="hidden" name="filmId" id="id" value=""/>
+                    <div class="modal-body">
+                        <p>确认删除？</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="submit" class="btn btn-danger">删除</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--添加影院信息模态框,商家没有任何影院的情况下弹出-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="addCanema">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="form-horizontal" role="form" enctype="multipart/form-data" th:action="@{/business/addCanema}" method="post">
+                    <div class="modal-header">
+                        <h4>添加影院信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="canemaInfo" id="canemaInfo">
+                            <div class="input-group">
+                                <span class="input-group-addon">影院名称</span>
+                                <input type="text" class="form-control" placeholder="请输入影院名称" name="canemaName" required>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon">影院地址</span>
+                                <input type="text" class="form-control" placeholder="请输入影院地址" name="canemaAddress" required>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon">联系方式</span>
+                                <input type="text" class="form-control" placeholder="请输入联系方式" name="canemaLine" required>
+                            </div>
+                            <div class="file-field input-field">
+                                <div class="btn">
+                                    <span>选择照片</span>
+                                    <input type="file" name="file" required></input>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">添加</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--消息模态框-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="alertMsg">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p th:text="${msg}" id="msgP"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="javascript:go1();">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--消息模态框-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="alert">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p th:text="${alert}" id="msg"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="javascript:go2();">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{../../static/js/jquery-3.0.0.min.js}" type="text/javascript"></script>
+    <script th:src="@{../../static/js/bootstrap.js}" type="text/javascript"></script>
+    <script th:inline="javascript">
+
+        $("#nav li:nth-child(1)").addClass("active");
+
+        var msg = /*[[${msg}]]*/ null;
+        var isAdd = /*[[${isAdd}]]*/ null;
+        var alert = /*[[${alert}]]*/ null;
+
+        if(msg != null) {
+            // 显示信息
+            $('#alertMsg').modal('show');
+        }
+
+        if(alert != null) {
+            // 显示信息
+            $('#alert').modal('show');
+        }
+
+        if(isAdd == 0) {
+            $('#addCanema').modal('show');
+        }
+
+        // 跳转到接口
+        function go1() {
+            window.location.href = "/business/film/list";
+        }
+
+        // 跳转到接口
+        function go2() {
+            window.location.href = "/business/canema/info";
+        }
+
+        // 传递电影的id
+        function passId(id) {
+            $("#id").val(id);
+        }
+
+        // 更新时
+        function passUpdateId(id, film_name, film_info, img_url, film_price, film_time) {
+            $("#updateId").val(id);
+            $("#updateFilmName").val(film_name);
+            $("#updateFilmInfo").val(film_info);
+            $("#updateFilmPrice").val(film_price);
+            $("#updateFilmTime").val(film_time);
+            $('#imgSrc').attr("src", img_url);
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zmq.filmsystem.dao.OrdersMapper" >
+
+    <!--删除某部电影相关的订单-->
+    <delete id="deleteOrders">
+        delete from orders
+        <where>
+            film_id = #{filmId}
+        </where>
+    </delete>
+
+    <!--获取某个商家的订单列表-->
+    <select id="getCanemaOrderList" resultType="map">
+        select order_id, user_name, film_name, film_seat_row, film_seat_col, order_time
+        from orders inner join user on user.user_id = orders.user_id
+        inner join film on film.film_id = orders.film_id and film.canema_id = #{canemaId}
+        order by order_id desc limit #{toPageNo}, #{pageSize}
+    </select>
+
+    <!--获取某个商家的订单总数-->
+    <select id="getCanemaOrderNum" resultType="Integer">
+        select count(order_id)
+        from orders inner join film on film.film_id = orders.film_id and film.canema_id = #{canemaId}
+    </select>
+
+    <!--获取某个顾客的订单列表-->
+    <select id="getCustomerOrderList" resultType="map">
+        select order_id, film_name, film_price, film_time, film_seat_row, film_seat_col, order_time
+        from orders inner join film on film.film_id = orders.film_id
+        <where>
+            orders.user_id = #{userId}
+        </where>
+        order by order_id desc limit #{toPageNo}, #{pageSize}
+    </select>
+
+    <!--获取某个顾客的订单总数-->
+    <select id="getCustomerOrderNum" resultType="Integer">
+        select count(order_id)
+        from orders
+        <where>
+            user_id = #{userId}
+        </where>
+    </select>
+
+    <!--获取订单电影的开始时间-->
+    <select id="getOrderInfo" resultType="map">
+        select film_time, orders.film_id, film_seat_row, film_seat_col from orders inner join film on orders.film_id = film.film_id
+        and order_id = #{orderId}
+    </select>
+
+    <!--退票操作-->
+    <delete id="backTickets">
+        delete from orders where order_id = #{orderId}
+    </delete>
+
+    <!--插入一条订单记录-->
+    <insert id="addOrder" parameterType="orders">
+        insert into orders(user_id, film_id, film_seat_row, film_seat_col)
+        values(#{userId}, #{filmId}, #{filmSeatRow}, #{filmSeatCol})
+    </insert>
+
+</mapper>

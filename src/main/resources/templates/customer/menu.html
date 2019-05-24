@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<div class="col-md-2" th:fragment="menu">
+    <ul class="nav nav-pills nav-stacked" id="nav">
+        <li>
+            <a th:href="@{/customer/order/list}">订单管理
+                <span class="glyphicon glyphicon-heart pull-right"></span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/customer/passwordReset}">修改密码
+                <sapn class="glyphicon glyphicon-pencil pull-right" />
+            </a>
+        </li>
+    </ul>
+</div>

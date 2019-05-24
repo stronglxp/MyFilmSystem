@@ -1,0 +1,72 @@
+body {
+    background-image: url("../images/login_bg.jpg")
+}
+
+
+.title {
+    font-size: 30px;
+    color: #00c3df;
+    text-align: center
+}
+
+input::-ms-input-placeholder {
+    text-align: center
+}
+
+input::-webkit-input-placeholder {
+    text-align: center
+}
+
+.input-group {
+    margin-top: 10px
+}
+
+.btn-position {
+    margin-top: 30px
+}
+
+.btn-position button {
+    width: 30%;
+    border-color: #00accc
+}
+
+.register {
+    float: left
+}
+
+.login {
+    float: right
+}
+
+.foot {
+    position: fixed;
+    bottom: 20px;
+    color: #989898;
+    text-align: center;
+    width: 100%
+}
+
+.titleInfo {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    color: #0f0f0f;
+}
+
+.form-group {
+    border: 4px solid #00accc;
+    padding: 50px;
+    border-radius: 20px;
+}
+
+.hide {
+    display: none;
+}
+
+.role {
+    text-align: center;
+}
+
+.roleName {
+    margin-right: 30px;
+}

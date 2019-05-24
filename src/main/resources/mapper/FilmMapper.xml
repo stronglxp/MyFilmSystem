@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zmq.filmsystem.dao.FilmMapper" >
+
+    <!--获取某个影院的所有电影列表-->
+    <select id="getFilmList" resultType="map">
+        select film.film_id, film_name, film_info, film_price, film_time, img_url from film
+        inner join image on image.film_id = film.film_id and film.canema_id = #{canemaId}
+        order by film.film_id desc limit #{toPageNo}, #{pageSize}
+    </select>
+
+    <!--获取某个影院的电影总数量-->
+    <select id="getFilmNum" resultType="Integer">
+        select count(film_id) from film
+        <where>
+            canema_id = #{canemaId}
+        </where>
+    </select>
+
+    <!--增加一部电影-->
+    <insert id="addFilm" parameterType="film" useGeneratedKeys="true" keyProperty="filmId">
+        insert into film(film_name, film_info, film_price, film_time, canema_id)
+        value (#{filmName}, #{filmInfo}, #{filmPrice}, #{filmTime}, #{canemaId})
+    </insert>
+
+    <!--搜索电影-->
+    <select id="selectFilm" resultType="map" parameterType="film">
+        select film.film_id, film_name, film_info, film_price, film_time, img_url from film
+        inner join image on image.film_id = film.film_id and film.canema_id = #{canemaId}
+        <where>
+            film_name like '%' #{filmName} '%'
+        </where>
+    </select>
+
+    <!--删除一部电影-->
+    <delete id="deleteFilm">
+        delete from film
+        <where>
+            film_id = #{filmId}
+        </where>
+    </delete>
+
+    <!--查看电影是否存在-->
+    <select id="getFilmById" resultType="Integer">
+        select film_id from film
+        <where>
+            film_id = #{filmId}
+        </where>
+    </select>
+
+    <!--更新电影信息-->
+    <update id="updateFilm" parameterType="film">
+        update film set film_name = #{filmName}, film_info = #{filmInfo},
+                       film_price = #{filmPrice}, film_time = #{filmTime}
+        <where>
+            film_id = #{filmId}
+        </where>
+    </update>
+
+    <!--获取某个电影院的所有电影-->
+    <select id="getCanemaFilmList" resultType="map">
+        select film.film_id, film_name, film_info, film_price, film_time, canema_id, img_url from film
+        inner join image on image.film_id = film.film_id and film.canema_id = #{canemaId}
+        order by film.film_id desc
+    </select>
+
+    <!--搜索某个电影院的电影-->
+    <select id="searchCanemaFilm" resultType="map">
+        select film.film_id, film_name, film_info, film_price, film_time, canema_id, img_url from film
+        inner join image on image.film_id = film.film_id and film.canema_id = #{canemaId}
+        <where>
+            film_name like '%' #{filmName} '%'
+        </where>
+        order by film.film_id desc
+    </select>
+
+    <!--获取某部电影的所有信息-->
+    <select id="getFilmInfoById" resultType="film">
+        select film_id, film_name, film_price, film_time from film
+        <where>
+            film_id = #{filmId}
+        </where>
+    </select>
+
+</mapper>

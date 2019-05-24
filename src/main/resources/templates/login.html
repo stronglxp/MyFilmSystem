@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>用户登陆 | 注册</title>
+    <!-- Bootstrap -->
+    <link th:href="@{../static/css/bootstrap.css}" rel="stylesheet">
+    <link th:href="@{../static/css/bootstrap-theme.css}" rel="stylesheet">
+    <link th:href="@{../static/css/login.css}" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="login-position" id="loginText">
+        <div>
+            <p class="title">电影票务系统</p>
+        </div>
+
+        <div class="form-group col-md-6 col-md-offset-3" id="inputText">
+            <!--登录-->
+            <form class="form-horizontal" th:action="@{/login}" method="post" id="loginForm">
+                <p class="titleInfo">登录</p>
+                <div class="input-group">
+                    <span class="input-group-addon">用户名</span>
+                    <input type="text" class="form-control" placeholder="请输入您的用户名" name="userName" required>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">密码</span>
+                    <input type="password" class="form-control" placeholder="请输入您的登录密码" name="userPassword" required>
+                </div>
+                <div class="btn-position">
+                    <button type="button" class="btn btn-default register" onclick="showRegister();">注&nbsp;&nbsp;&nbsp;&nbsp;册</button>
+                    <button type="submit" class="btn btn-success login">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+                </div>
+            </form>
+
+            <!--注册-->
+            <form class="form-horizontal hide" th:action="@{/register}" method="post" id="registerForm">
+                <p class="titleInfo">注册</p>
+                <div class="input-group">
+                    <span class="input-group-addon">用户名</span>
+                    <input type="text" class="form-control" placeholder="请输入您的用户名" name="userName" required>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">密码</span>
+                    <input type="password" class="form-control" placeholder="请输入您的登录密码" name="userPassword" id="userPassword" required>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">确认密码</span>
+                    <input type="password" class="form-control" placeholder="请确认您的登录密码" name="userPassword1" id="userPassword1"
+                           onblur="checkData();" required>
+                </div>
+                <div class="role">
+                    <label class="radio-inline roleName">
+                        <input type="radio" name="roleId" id="business" value="2"> 商家
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="roleId" id="customer" value="3"> 顾客
+                    </label>
+                </div>
+
+                <div class="btn-position">
+                    <button type="button" class="btn btn-default register" onclick="showLogin();">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+                    <button type="submit" class="btn btn-success login">注&nbsp;&nbsp;&nbsp;&nbsp;册</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<!--消息模态框-->
+<div class="modal fade" tabindex="-1" role="dialog" id="errMsg">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p th:text="${msg}" id="msg"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{../static/js/jquery-3.0.0.min.js}" type="text/javascript"></script>
+<script th:src="@{../static/js/bootstrap.js}" type="text/javascript"></script>
+<script th:inline="javascript">
+
+    /*<![CDATA[*/
+
+    var msg = /*[[${msg}]]*/ null;
+    if(msg != null) {
+        // 显示错误信息
+        $('#errMsg').modal('show');
+    }
+
+    // 优化登陆页面
+    window.onload = function() {
+        var h = window.innerHeight
+            || document.documentElement.clientHeight
+            || document.body.clientHeight;
+        // 设置登陆框在页面中的位置
+        var text = $('#loginText').height() + $('#inputText').height();
+        document.getElementById('loginText').style.marginTop = (h - text) / 6 + "px";
+    }
+
+    // 显示注册框
+    function showRegister() {
+        $('#loginForm').addClass("hide");
+        $('#registerForm').removeClass("hide");
+    }
+
+    // 显示登陆框
+    function showLogin() {
+        $('#registerForm').addClass("hide");
+        $('#loginForm').removeClass("hide");
+    }
+
+    // 注册时检查数据是否正确
+    function checkData() {
+        var userPassword = $('#userPassword').val();
+        var userPassword1 = $('#userPassword1').val();
+
+        if(userPassword !== userPassword1) {
+            $('#msg').text('密码输入不一致!');
+            $('#errMsg').modal('show');
+        }
+    }
+
+    /*]]>*/
+
+</script>
+</body>
+</html>
