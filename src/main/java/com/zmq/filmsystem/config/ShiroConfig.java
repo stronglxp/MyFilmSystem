@@ -113,6 +113,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/customer/**", "authc,roles[customer]");
         // 登陆可以不需要认证
         filterChainDefinitionMap.put("/login", "anon");
+        filterChainDefinitionMap.put("/", "anon");
         // 注册可以不需要认证
         filterChainDefinitionMap.put("/register", "anon");
 
