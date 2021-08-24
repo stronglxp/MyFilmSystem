@@ -174,11 +174,15 @@ public class BusinessController {
         User user = userService.getUserInfo(businessName);
         if(user == null) {
             model.addAttribute("msg", "用户错误");
-            return "business/canemaInfo";
+            return "business/filmList";
         }
 
         // 获取影院信息
         Integer canemaId = user.getCanemaId();
+        if (canemaId == null) {
+            model.addAttribute("msg", "请先添加影院");
+            return "business/filmList";
+        }
         Canema canema = canemaService.getCanemaInfo(canemaId);
 
         model.addAttribute("canema", canema);
